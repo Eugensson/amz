@@ -4,3 +4,4 @@ export const APP_SLOGAN =
 export const APP_DESCRIPTION =
   process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
   "AMZ is an e-commerce app for buying and selling products online";
+export const PAGE_SIZE = Number(process.env.PAGE_SIZE || 9);
