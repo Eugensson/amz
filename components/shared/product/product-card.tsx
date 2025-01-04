@@ -1,18 +1,25 @@
 import Link from "next/link";
 import Image from "next/image";
 
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Rating } from "@/components/shared/product/rating";
+import { AddToCart } from "@/components/shared/product/add-to-cart";
 import { ImageHover } from "@/components/shared/product/image-hover";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ProductPrice } from "@/components/shared/product/product-price";
 
-import { formatNumber } from "@/lib/utils";
 import { IProduct } from "@/lib/db/models/product.model";
+import { formatNumber, generateId, round2 } from "@/lib/utils";
 
 export const ProductCard = ({
   product,
   hideBorder = false,
   hideDetails = false,
+  hideAddToCart = false,
 }: {
   product: IProduct;
   hideDetails?: boolean;
@@ -69,13 +76,37 @@ export const ProductCard = ({
     </div>
   );
 
+  const AddButton = () => (
+    <div className="w-full text-center">
+      <AddToCart
+        minimal
+        item={{
+          clientId: generateId(),
+          product: product._id,
+          size: product.sizes[0],
+          color: product.colors[0],
+          countInStock: product.countInStock,
+          name: product.name,
+          slug: product.slug,
+          category: product.category,
+          price: round2(product.price),
+          quantity: 1,
+          image: product.images[0],
+        }}
+      />
+    </div>
+  );
+
   return hideBorder ? (
     <div className="flex flex-col">
       <ProductImage />
       {!hideDetails && (
-        <div className="p-3 flex-1 text-center">
-          <ProductDetails />
-        </div>
+        <>
+          <div className="p-3 flex-1 text-center">
+            <ProductDetails />
+          </div>
+          {!hideAddToCart && <AddButton />}
+        </>
       )}
     </div>
   ) : (
@@ -84,9 +115,14 @@ export const ProductCard = ({
         <ProductImage />
       </CardHeader>
       {!hideDetails && (
-        <CardContent className="p-3 flex-1 text-center">
-          <ProductDetails />
-        </CardContent>
+        <>
+          <CardContent className="p-3 flex-1 text-center">
+            <ProductDetails />
+          </CardContent>
+          <CardFooter className="p-3">
+            {!hideAddToCart && <AddButton />}
+          </CardFooter>
+        </>
       )}
     </Card>
   );
