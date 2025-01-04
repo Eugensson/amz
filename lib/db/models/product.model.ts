@@ -87,10 +87,7 @@ const productSchema = new Schema<IProduct>(
       },
     ],
   },
-  {
-    timestamps: true,
-    versionKey: false,
-  }
+  { timestamps: true, versionKey: false }
 );
 
 const Product =
