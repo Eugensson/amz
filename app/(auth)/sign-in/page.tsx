@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { SeparatorWithOr } from "@/components/shared/separator-or";
+import { GoogleSignInForm } from "@/app/(auth)/sign-in/google-signin-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CredentialsSignInForm } from "@/app/(auth)/sign-in/credentials-signin-form";
 
@@ -37,6 +38,10 @@ const SignIn = async (props: {
         </CardHeader>
         <CardContent>
           <CredentialsSignInForm />
+          <SeparatorWithOr />
+          <div className="mt-4">
+            <GoogleSignInForm />
+          </div>
         </CardContent>
       </Card>
       <SeparatorWithOr>New to {APP_NAME}?</SeparatorWithOr>
