@@ -1,5 +1,5 @@
-import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from "clsx";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -23,14 +23,16 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat("en-US", {
   style: "currency",
   minimumFractionDigits: 2,
 });
-export function formatCurrency(amount: number) {
+
+export const formatCurrency = (amount: number) => {
   return CURRENCY_FORMATTER.format(amount);
-}
+};
 
 const NUMBER_FORMATTER = new Intl.NumberFormat("en-US");
-export function formatNumber(number: number) {
+
+export const formatNumber = (number: number) => {
   return NUMBER_FORMATTER.format(number);
-}
+};
 
 export const round2 = (num: number) =>
   Math.round((num + Number.EPSILON) * 100) / 100;
@@ -60,4 +62,81 @@ export const formatError = (error: any): string => {
       ? error.message
       : JSON.stringify(error.message);
   }
+};
+
+export const calculateFutureDate = (days: number) => {
+  const currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() + days);
+  return currentDate;
+};
+
+export const getMonthName = (yearAndMonth: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [year, monthNumber] = yearAndMonth.split("-");
+  const date = new Date();
+  date.setMonth(parseInt(monthNumber) - 1);
+  return new Date().getMonth() === parseInt(monthNumber) - 1
+    ? `${date.toLocaleString("default", { month: "long" })} (ongoing)`
+    : date.toLocaleString("default", { month: "long" });
+};
+
+export const calculatePastDate = (days: number) => {
+  const currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() - days);
+  return currentDate;
+};
+
+export const timeUntilMidnight = (): { hours: number; minutes: number } => {
+  const now = new Date();
+  const midnight = new Date();
+  midnight.setHours(24, 0, 0, 0);
+  const diff = midnight.getTime() - now.getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+  return { hours, minutes };
+};
+
+export const formatDateTime = (dateString: Date) => {
+  const dateTimeOptions: Intl.DateTimeFormatOptions = {
+    month: "short",
+    year: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
+
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    month: "short",
+    year: "numeric",
+    day: "numeric",
+  };
+
+  const timeOptions: Intl.DateTimeFormatOptions = {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
+
+  const formattedDateTime: string = new Date(dateString).toLocaleString(
+    "en-US",
+    dateTimeOptions
+  );
+
+  const formattedDate: string = new Date(dateString).toLocaleString(
+    "en-US",
+    dateOptions
+  );
+
+  const formattedTime: string = new Date(dateString).toLocaleString(
+    "en-US",
+    timeOptions
+  );
+
+  return {
+    dateTime: formattedDateTime,
+    dateOnly: formattedDate,
+    timeOnly: formattedTime,
+  };
 };
