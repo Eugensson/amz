@@ -140,3 +140,7 @@ export const formatDateTime = (dateString: Date) => {
     timeOnly: formattedTime,
   };
 };
+
+export const formatId = (id: string) => {
+  return `..${id.substring(id.length - 6)}`;
+};
