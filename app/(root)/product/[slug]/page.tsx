@@ -1,7 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import { Rating } from "@/components/shared/product/rating";
 import { AddToCart } from "@/components/shared/product/add-to-cart";
+import { ReviewList } from "@/app/(root)/product/[slug]/review-list";
 import { ProductPrice } from "@/components/shared/product/product-price";
 import { SelectVariant } from "@/components/shared/product/select-variant";
 import { ProductSlider } from "@/components/shared/product/product-slider";
@@ -9,12 +9,14 @@ import { ProductGallery } from "@/components/shared/product/product-gallery";
 import { BrowsingHistoryList } from "@/components/shared/browsing-history-list";
 import { AddToBrowsingHistory } from "@/components/shared/product/add-to-browsing-history";
 
-import { generateId, round2 } from "@/lib/utils";
+import { auth } from "@/auth";
 
 import {
   getProductBySlug,
   getRelatedProductsByCategory,
 } from "@/lib/actions/product.actions";
+import { generateId, round2 } from "@/lib/utils";
+import { RatingSummary } from "@/components/shared/product/rating-summary";
 
 export const generateMetadata = async (props: {
   params: Promise<{ slug: string }>;
@@ -36,6 +38,7 @@ const ProductDetails = async (props: {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ page: string; color: string; size: string }>;
 }) => {
+  const session = await auth();
   const searchParams = await props.searchParams;
 
   const { page, color, size } = searchParams;
@@ -67,11 +70,12 @@ const ProductDetails = async (props: {
                 Brand {product.brand} {product.category}
               </p>
               <h1 className="font-bold text-lg lg:text-xl">{product.name}</h1>
-              <div className="flex items-center gap-2">
-                <span>{product.avgRating.toFixed(1)}</span>
-                <Rating rating={product.avgRating} />
-                <span>{product.numReviews} ratings</span>
-              </div>
+              <RatingSummary
+                avgRating={product.avgRating}
+                numReviews={product.numReviews}
+                asPopover
+                ratingDistribution={product.ratingDistribution}
+              />
               <Separator />
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="flex gap-3">
@@ -137,6 +141,12 @@ const ProductDetails = async (props: {
             </Card>
           </div>
         </div>
+      </section>
+      <section className="mt-10">
+        <h2 className="h2-bold mb-2" id="reviews">
+          Customer Reviews
+        </h2>
+        <ReviewList product={product} userId={session?.user.id} />
       </section>
       <section className="mt-10">
         <ProductSlider
