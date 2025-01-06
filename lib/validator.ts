@@ -146,6 +146,10 @@ export const UserSignUpSchema = UserSignInSchema.extend({
   path: ["confirmPassword"],
 });
 
+export const UserNameSchema = z.object({
+  name: UserName,
+});
+
 export const OrderInputSchema = z.object({
   user: z.union([
     MongoId,

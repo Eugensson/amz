@@ -3,14 +3,14 @@
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
-import { signIn, signOut } from "@/auth";
+import { auth, signIn, signOut } from "@/auth";
 
 import { formatError } from "@/lib/utils";
 import { connectToDatabase } from "@/lib/db";
 import User from "@/lib/db/models/user.model";
 import { UserSignUpSchema } from "@/lib/validator";
 
-import { IUserSignIn, IUserSignUp } from "@/types";
+import { IUserName, IUserSignIn, IUserSignUp } from "@/types";
 
 export const signInWithCredentials = async (user: IUserSignIn) => {
   return await signIn("credentials", { ...user, redirect: false });
@@ -24,7 +24,7 @@ export const SignOut = async () => {
   redirect(redirectTo.redirect);
 };
 
-export async function registerUser(userSignUp: IUserSignUp) {
+export const registerUser = async (userSignUp: IUserSignUp) => {
   try {
     const user = await UserSignUpSchema.parseAsync({
       name: userSignUp.name,
@@ -42,4 +42,22 @@ export async function registerUser(userSignUp: IUserSignUp) {
   } catch (error) {
     return { success: false, error: formatError(error) };
   }
-}
+};
+
+export const updateUserName = async (user: IUserName) => {
+  try {
+    await connectToDatabase();
+    const session = await auth();
+    const currentUser = await User.findById(session?.user?.id);
+    if (!currentUser) throw new Error("User not found");
+    currentUser.name = user.name;
+    const updatedUser = await currentUser.save();
+    return {
+      success: true,
+      message: "User updated successfully",
+      data: JSON.parse(JSON.stringify(updatedUser)),
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+};
