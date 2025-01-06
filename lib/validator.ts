@@ -186,3 +186,7 @@ export const OrderInputSchema = z.object({
   isPaid: z.boolean().default(false),
   paidAt: z.date().optional(),
 });
+
+export const ProductUpdateSchema = ProductInputSchema.extend({
+  _id: z.string(),
+});

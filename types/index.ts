@@ -14,6 +14,7 @@ import {
 } from "@/lib/validator";
 
 export type IReviewInput = z.infer<typeof ReviewInputSchema>;
+
 export type IReviewDetails = IReviewInput & {
   _id: string;
   createdAt: string;
@@ -46,8 +47,16 @@ export type Data = {
 };
 
 export type Cart = z.infer<typeof CartSchema>;
-export type OrderItem = z.infer<typeof OrderItemSchema>;
 export type IOrderInput = z.infer<typeof OrderInputSchema>;
+export type IOrderList = IOrderInput & {
+  _id: string;
+  user: {
+    name: string;
+    email: string;
+  };
+  createdAt: Date;
+};
+export type OrderItem = z.infer<typeof OrderItemSchema>;
 export type ShippingAddress = z.infer<typeof ShippingAddressSchema>;
 
 export type IUserName = z.infer<typeof UserNameSchema>;

@@ -1,16 +1,228 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { DateRange } from "react-day-picker";
 
 import { auth } from "@/auth";
 import { paypal } from "@/lib/paypal";
 import { connectToDatabase } from "@/lib/db";
+import User from "@/lib/db/models/user.model";
+import { sendPurchaseReceipt } from "@/emails";
 import { formatError, round2 } from "@/lib/utils";
 import { OrderInputSchema } from "@/lib/validator";
-import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from "@/lib/constants";
-import { Cart, OrderItem, ShippingAddress } from "@/types";
+import Product from "@/lib/db/models/product.model";
 import Order, { IOrder } from "@/lib/db/models/order.model";
-import { sendPurchaseReceipt } from "@/emails";
+import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from "@/lib/constants";
+
+import { Cart, IOrderList, OrderItem, ShippingAddress } from "@/types";
+
+export const getOrderSummary = async (date: DateRange) => {
+  await connectToDatabase();
+
+  const ordersCount = await Order.countDocuments({
+    createdAt: {
+      $gte: date.from,
+      $lte: date.to,
+    },
+  });
+
+  const productsCount = await Product.countDocuments({
+    createdAt: {
+      $gte: date.from,
+      $lte: date.to,
+    },
+  });
+
+  const usersCount = await User.countDocuments({
+    createdAt: {
+      $gte: date.from,
+      $lte: date.to,
+    },
+  });
+
+  const totalSalesResult = await Order.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: date.from,
+          $lte: date.to,
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        sales: { $sum: "$totalPrice" },
+      },
+    },
+    { $project: { totalSales: { $ifNull: ["$sales", 0] } } },
+  ]);
+
+  const totalSales = totalSalesResult[0] ? totalSalesResult[0].totalSales : 0;
+
+  const today = new Date();
+
+  const sixMonthEarlierDate = new Date(
+    today.getFullYear(),
+    today.getMonth() - 5,
+    1
+  );
+
+  const monthlySales = await Order.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: sixMonthEarlierDate,
+        },
+      },
+    },
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+        totalSales: { $sum: "$totalPrice" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        label: "$_id",
+        value: "$totalSales",
+      },
+    },
+
+    { $sort: { label: -1 } },
+  ]);
+
+  const topSalesCategories = await getTopSalesCategories(date);
+
+  const topSalesProducts = await getTopSalesProducts(date);
+
+  const latestOrders = await Order.find()
+    .populate("user", "name")
+    .sort({ createdAt: "desc" })
+    .limit(PAGE_SIZE);
+
+  return {
+    ordersCount,
+    productsCount,
+    usersCount,
+    totalSales,
+    monthlySales: JSON.parse(JSON.stringify(monthlySales)),
+    salesChartData: JSON.parse(JSON.stringify(await getSalesChartData(date))),
+    topSalesCategories: JSON.parse(JSON.stringify(topSalesCategories)),
+    topSalesProducts: JSON.parse(JSON.stringify(topSalesProducts)),
+    latestOrders: JSON.parse(JSON.stringify(latestOrders)) as IOrderList[],
+  };
+};
+
+const getSalesChartData = async (date: DateRange) => {
+  const result = await Order.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: date.from,
+          $lte: date.to,
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          year: { $year: "$createdAt" },
+          month: { $month: "$createdAt" },
+          day: { $dayOfMonth: "$createdAt" },
+        },
+        totalSales: { $sum: "$totalPrice" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        date: {
+          $concat: [
+            { $toString: "$_id.year" },
+            "/",
+            { $toString: "$_id.month" },
+            "/",
+            { $toString: "$_id.day" },
+          ],
+        },
+        totalSales: 1,
+      },
+    },
+    { $sort: { date: 1 } },
+  ]);
+
+  return result;
+};
+
+const getTopSalesProducts = async (date: DateRange) => {
+  const result = await Order.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: date.from,
+          $lte: date.to,
+        },
+      },
+    },
+    { $unwind: "$items" },
+    {
+      $group: {
+        _id: {
+          name: "$items.name",
+          image: "$items.image",
+          _id: "$items.product",
+        },
+        totalSales: {
+          $sum: { $multiply: ["$items.quantity", "$items.price"] },
+        },
+      },
+    },
+    {
+      $sort: {
+        totalSales: -1,
+      },
+    },
+    { $limit: 6 },
+    {
+      $project: {
+        _id: 0,
+        id: "$_id._id",
+        label: "$_id.name",
+        image: "$_id.image",
+        value: "$totalSales",
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  return result;
+};
+
+const getTopSalesCategories = async (date: DateRange, limit = 5) => {
+  const result = await Order.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: date.from,
+          $lte: date.to,
+        },
+      },
+    },
+    { $unwind: "$items" },
+    {
+      $group: {
+        _id: "$items.category",
+        totalSales: { $sum: "$items.quantity" },
+      },
+    },
+    { $sort: { totalSales: -1 } },
+    { $limit: limit },
+  ]);
+
+  return result;
+};
 
 export const createOrder = async (clientSideCart: Cart) => {
   try {
