@@ -4,20 +4,20 @@ import { PAGE_SIZE } from "@/lib/constants";
 import { connectToDatabase } from "@/lib/db";
 import Product, { IProduct } from "@/lib/db/models/product.model";
 
-export async function getAllCategories() {
+export const getAllCategories = async () => {
   await connectToDatabase();
   const categories = await Product.find({ isPublished: true }).distinct(
     "category"
   );
   return categories;
-}
-export async function getProductsForCard({
+};
+export const getProductsForCard = async ({
   tag,
   limit = 4,
 }: {
   tag: string;
   limit?: number;
-}) {
+}) => {
   await connectToDatabase();
   const products = await Product.find(
     { tags: { $in: [tag] }, isPublished: true },
@@ -34,15 +34,15 @@ export async function getProductsForCard({
     href: string;
     image: string;
   }[];
-}
+};
 
-export async function getProductsByTag({
+export const getProductsByTag = async ({
   tag,
   limit = 10,
 }: {
   tag: string;
   limit?: number;
-}) {
+}) => {
   await connectToDatabase();
   const products = await Product.find({
     tags: { $in: [tag] },
@@ -51,16 +51,16 @@ export async function getProductsByTag({
     .sort({ createdAt: "desc" })
     .limit(limit);
   return JSON.parse(JSON.stringify(products)) as IProduct[];
-}
+};
 
-export async function getProductBySlug(slug: string) {
+export const getProductBySlug = async (slug: string) => {
   await connectToDatabase();
   const product = await Product.findOne({ slug, isPublished: true });
   if (!product) throw new Error("Product not found");
   return JSON.parse(JSON.stringify(product)) as IProduct;
-}
+};
 
-export async function getRelatedProductsByCategory({
+export const getRelatedProductsByCategory = async ({
   category,
   productId,
   limit = PAGE_SIZE,
@@ -70,7 +70,7 @@ export async function getRelatedProductsByCategory({
   productId: string;
   limit?: number;
   page: number;
-}) {
+}) => {
   await connectToDatabase();
   const skipAmount = (Number(page) - 1) * limit;
   const conditions = {
@@ -87,4 +87,121 @@ export async function getRelatedProductsByCategory({
     data: JSON.parse(JSON.stringify(products)) as IProduct[],
     totalPages: Math.ceil(productsCount / limit),
   };
-}
+};
+
+export const getAllProducts = async ({
+  query,
+  limit,
+  page,
+  category,
+  tag,
+  price,
+  rating,
+  sort,
+}: {
+  query: string;
+  category: string;
+  tag: string;
+  limit?: number;
+  page: number;
+  price?: string;
+  rating?: string;
+  sort?: string;
+}) => {
+  limit = limit || PAGE_SIZE;
+  await connectToDatabase();
+
+  const queryFilter =
+    query && query !== "all"
+      ? {
+          name: {
+            $regex: query,
+            $options: "i",
+          },
+        }
+      : {};
+
+  const categoryFilter = category && category !== "all" ? { category } : {};
+
+  const tagFilter = tag && tag !== "all" ? { tags: tag } : {};
+
+  const ratingFilter =
+    rating && rating !== "all"
+      ? {
+          avgRating: {
+            $gte: Number(rating),
+          },
+        }
+      : {};
+
+  const priceFilter =
+    price && price !== "all"
+      ? {
+          price: {
+            $gte: Number(price.split("-")[0]),
+            $lte: Number(price.split("-")[1]),
+          },
+        }
+      : {};
+
+  const order: Record<string, 1 | -1> =
+    sort === "best-selling"
+      ? { numSales: -1 }
+      : sort === "price-low-to-high"
+        ? { price: 1 }
+        : sort === "price-high-to-low"
+          ? { price: -1 }
+          : sort === "avg-customer-review"
+            ? { avgRating: -1 }
+            : { _id: -1 };
+
+  const isPublished = { isPublished: true };
+
+  const products = await Product.find({
+    ...isPublished,
+    ...queryFilter,
+    ...tagFilter,
+    ...categoryFilter,
+    ...priceFilter,
+    ...ratingFilter,
+  })
+    .sort(order)
+    .skip(limit * (Number(page) - 1))
+    .limit(limit)
+    .lean();
+
+  const countProducts = await Product.countDocuments({
+    ...queryFilter,
+    ...tagFilter,
+    ...categoryFilter,
+    ...priceFilter,
+    ...ratingFilter,
+  });
+
+  return {
+    products: JSON.parse(JSON.stringify(products)) as IProduct[],
+    totalPages: Math.ceil(countProducts / limit),
+    totalProducts: countProducts,
+    from: limit * (Number(page) - 1) + 1,
+    to: limit * (Number(page) - 1) + products.length,
+  };
+};
+
+export const getAllTags = async () => {
+  const tags = await Product.aggregate([
+    { $unwind: "$tags" },
+    { $group: { _id: null, uniqueTags: { $addToSet: "$tags" } } },
+    { $project: { _id: 0, uniqueTags: 1 } },
+  ]);
+
+  return (
+    (tags[0]?.uniqueTags
+      .sort((a: string, b: string) => a.localeCompare(b))
+      .map((x: string) =>
+        x
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
+      ) as string[]) || []
+  );
+};

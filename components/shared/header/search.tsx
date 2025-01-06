@@ -10,10 +10,11 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { APP_NAME } from "@/lib/constants";
+import { getAllCategories } from "@/lib/actions/product.actions";
 
-const categories = ["man", "woman", "kids", "accessories"];
+export const Search = async () => {
+  const categories = await getAllCategories();
 
-export const Search = () => {
   return (
     <form action="/search" method="GET" className="h-10 flex items-stretch">
       <Select name="category">
