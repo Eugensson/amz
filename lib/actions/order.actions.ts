@@ -7,7 +7,7 @@ import { paypal } from "@/lib/paypal";
 import { connectToDatabase } from "@/lib/db";
 import { formatError, round2 } from "@/lib/utils";
 import { OrderInputSchema } from "@/lib/validator";
-import { AVAILABLE_DELIVERY_DATES } from "@/lib/constants";
+import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from "@/lib/constants";
 import { Cart, OrderItem, ShippingAddress } from "@/types";
 import Order, { IOrder } from "@/lib/db/models/order.model";
 import { sendPurchaseReceipt } from "@/emails";
@@ -63,6 +63,34 @@ export const getOrderById = async (orderId: string): Promise<IOrder> => {
   await connectToDatabase();
   const order = await Order.findById(orderId);
   return JSON.parse(JSON.stringify(order));
+};
+
+export const getMyOrders = async ({
+  limit,
+  page,
+}: {
+  limit?: number;
+  page: number;
+}) => {
+  limit = limit || PAGE_SIZE;
+  await connectToDatabase();
+  const session = await auth();
+  if (!session) {
+    throw new Error("User is not authenticated");
+  }
+  const skipAmount = (Number(page) - 1) * limit;
+  const orders = await Order.find({
+    user: session?.user?.id,
+  })
+    .sort({ createdAt: "desc" })
+    .skip(skipAmount)
+    .limit(limit);
+  const ordersCount = await Order.countDocuments({ user: session?.user?.id });
+
+  return {
+    data: JSON.parse(JSON.stringify(orders)),
+    totalPages: Math.ceil(ordersCount / limit),
+  };
 };
 
 export const createPayPalOrder = async (orderId: string) => {

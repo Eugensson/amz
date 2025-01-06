@@ -1,3 +1,4 @@
+import qs from "query-string";
 import { twMerge } from "tailwind-merge";
 import { clsx, type ClassValue } from "clsx";
 
@@ -143,4 +144,26 @@ export const formatDateTime = (dateString: Date) => {
 
 export const formatId = (id: string) => {
   return `..${id.substring(id.length - 6)}`;
+};
+
+export const formUrlQuery = ({
+  params,
+  key,
+  value,
+}: {
+  params: string;
+  key: string;
+  value: string | null;
+}) => {
+  const currentUrl = qs.parse(params);
+
+  currentUrl[key] = value;
+
+  return qs.stringifyUrl(
+    {
+      url: window.location.pathname,
+      query: currentUrl,
+    },
+    { skipNull: true }
+  );
 };
