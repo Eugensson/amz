@@ -14,13 +14,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ActionButton } from "@/components/shared/action-button";
 import { ProductPrice } from "@/components/shared/product/product-price";
 
 import { cn, formatDateTime } from "@/lib/utils";
 import { IOrder } from "@/lib/db/models/order.model";
+import { deliverOrder, updateOrderToPaid } from "@/lib/actions/order.actions";
 
 export const OrderDetailsForm = ({
   order,
+  isAdmin,
 }: {
   order: IOrder;
   isAdmin: boolean;
@@ -161,6 +164,19 @@ export const OrderDetailsForm = ({
               >
                 Pay Order
               </Link>
+            )}
+
+            {isAdmin && !isPaid && paymentMethod === "Cash On Delivery" && (
+              <ActionButton
+                caption="Mark as paid"
+                action={() => updateOrderToPaid(order._id)}
+              />
+            )}
+            {isAdmin && isPaid && !isDelivered && (
+              <ActionButton
+                caption="Mark as delivered"
+                action={() => deliverOrder(order._id)}
+              />
             )}
           </CardContent>
         </Card>
