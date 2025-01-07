@@ -5,6 +5,8 @@ export const SERVER_URL =
 export const SENDER_EMAIL = process.env.SENDER_EMAIL || "onboarding@resend.dev";
 export const SENDER_NAME = process.env.SENDER_NAME || APP_NAME;
 
+export const USER_ROLES = ["Admin", "User"];
+
 export const APP_SLOGAN =
   process.env.NEXT_PUBLIC_APP_SLOGAN || "Spend less, enjoy more";
 
