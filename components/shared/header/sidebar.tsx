@@ -1,11 +1,11 @@
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 import { X, ChevronRight, UserCircle, MenuIcon } from "lucide-react";
 
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -15,15 +15,18 @@ import { Button } from "@/components/ui/button";
 import { SignOut } from "@/lib/actions/user.actions";
 
 import { auth } from "@/auth";
+import { getDirection } from "@/i18n-config";
 
 export const Sidebar = async ({ categories }: { categories: string[] }) => {
   const session = await auth();
+  const locale = await getLocale();
+  const t = await getTranslations();
 
   return (
-    <Drawer direction="left">
+    <Drawer direction={getDirection(locale) === "rtl" ? "right" : "left"}>
       <DrawerTrigger className="header-button flex items-center !p-2">
         <MenuIcon size={20} className="mr-1" />
-        All
+        {t("Header.All")}
       </DrawerTrigger>
       <DrawerContent className="w-[350px] mt-0 top-0">
         <div className="flex flex-col h-full">
@@ -35,7 +38,7 @@ export const Sidebar = async ({ categories }: { categories: string[] }) => {
                   <DrawerClose asChild>
                     <Link href="/account">
                       <span className="text-lg font-semibold">
-                        Hello, {session.user.name}
+                        {t("Header.Hello")}, {session.user.name}
                       </span>
                     </Link>
                   </DrawerClose>
@@ -43,13 +46,12 @@ export const Sidebar = async ({ categories }: { categories: string[] }) => {
                   <DrawerClose asChild>
                     <Link href="/sign-in">
                       <span className="text-lg font-semibold">
-                        Hello, sign in
+                        {t("Header.Hello")}, {t("Header.sign in")}
                       </span>
                     </Link>
                   </DrawerClose>
                 )}
               </DrawerTitle>
-              <DrawerDescription></DrawerDescription>
             </DrawerHeader>
             <DrawerClose asChild>
               <Button variant="ghost" size="icon" className="mr-2">
@@ -61,7 +63,9 @@ export const Sidebar = async ({ categories }: { categories: string[] }) => {
 
           <div className="flex-1 overflow-y-auto">
             <div className="p-4 border-b">
-              <h2 className="text-lg font-semibold">Shop By Department</h2>
+              <h2 className="text-lg font-semibold">
+                {t("Header.Shop By Department")}
+              </h2>
             </div>
             <nav className="flex flex-col">
               {categories.map((category) => (
@@ -80,16 +84,18 @@ export const Sidebar = async ({ categories }: { categories: string[] }) => {
 
           <div className="border-t flex flex-col">
             <div className="p-4">
-              <h2 className="text-lg font-semibold">Help & Settings</h2>
+              <h2 className="text-lg font-semibold">
+                {t("Header.Help & Settings")}
+              </h2>
             </div>
             <DrawerClose asChild>
               <Link href="/account" className="item-button">
-                Your account
+                {t("Header.Your account")}
               </Link>
             </DrawerClose>{" "}
             <DrawerClose asChild>
               <Link href="/page/customer-service" className="item-button">
-                Customer Service
+                {t("Header.Customer Service")}
               </Link>
             </DrawerClose>
             {session ? (
@@ -98,12 +104,12 @@ export const Sidebar = async ({ categories }: { categories: string[] }) => {
                   className="w-full justify-start item-button text-base"
                   variant="ghost"
                 >
-                  Sign out
+                  {t("Header.Sign out")}
                 </Button>
               </form>
             ) : (
               <Link href="/sign-in" className="item-button">
-                Sign in
+                {t("Header.Sign in")}
               </Link>
             )}
           </div>

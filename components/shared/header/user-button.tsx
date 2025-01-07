@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+import { ChevronDownIcon } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 import {
   DropdownMenu,
@@ -18,6 +19,7 @@ import { SignOut } from "@/lib/actions/user.actions";
 
 export const UserButton = async () => {
   const session = await auth();
+  const t = await getTranslations();
 
   return (
     <div className="flex gap-2 items-center">
@@ -25,10 +27,13 @@ export const UserButton = async () => {
         <DropdownMenuTrigger className="header-button" asChild>
           <div className="flex items-center">
             <div className="flex flex-col text-xs text-left">
-              <span>Hello, {session ? session.user.name : "sign in"}</span>
-              <span className="font-bold">Account & Orders</span>
+              <span>
+                {t("Header.Hello")},{" "}
+                {session ? session.user.name : t("Header.sign in")}
+              </span>
+              <span className="font-bold">{t("Header.Account & Orders")}</span>
             </div>
-            <ChevronDown />
+            <ChevronDownIcon />
           </div>
         </DropdownMenuTrigger>
         {session ? (
@@ -45,15 +50,15 @@ export const UserButton = async () => {
             </DropdownMenuLabel>
             <DropdownMenuGroup>
               <Link className="w-full" href="/account">
-                <DropdownMenuItem>Your account</DropdownMenuItem>
+                <DropdownMenuItem>{t("Header.Your account")}</DropdownMenuItem>
               </Link>
               <Link className="w-full" href="/account/orders">
-                <DropdownMenuItem>Your orders</DropdownMenuItem>
+                <DropdownMenuItem>{t("Header.Your orders")}</DropdownMenuItem>
               </Link>
 
               {session.user.role === "Admin" && (
                 <Link className="w-full" href="/admin/overview">
-                  <DropdownMenuItem>Admin</DropdownMenuItem>
+                  <DropdownMenuItem>{t("Header.Admin")}</DropdownMenuItem>
                 </Link>
               )}
             </DropdownMenuGroup>
@@ -63,7 +68,7 @@ export const UserButton = async () => {
                   className="w-full py-4 px-2 h-4 justify-start"
                   variant="ghost"
                 >
-                  Sign out
+                  {t("Header.Sign out")}
                 </Button>
               </form>
             </DropdownMenuItem>
@@ -76,13 +81,14 @@ export const UserButton = async () => {
                   className={cn(buttonVariants(), "w-full")}
                   href="/sign-in"
                 >
-                  Sign in
+                  {t("Header.Sign in")}
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuLabel>
               <div className="font-normal">
-                New Customer? <Link href="/sign-up">Sign up</Link>
+                {t("Header.New Customer")}?{" "}
+                <Link href="/sign-up">{t("Header.Sign up")}</Link>
               </div>
             </DropdownMenuLabel>
           </DropdownMenuContent>

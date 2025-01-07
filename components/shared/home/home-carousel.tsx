@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 import Autoplay from "embla-carousel-autoplay";
 
 import {
@@ -14,16 +15,11 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 
-export const HomeCarousel = ({
-  items,
-}: {
-  items: {
-    image: string;
-    url: string;
-    title: string;
-    buttonCaption: string;
-  }[];
-}) => {
+import { cn } from "@/lib/utils";
+import { ICarousel } from "@/types";
+
+export const HomeCarousel = ({ items }: { items: ICarousel[] }) => {
+  const t = useTranslations("Home");
   const plugin = useRef(Autoplay({ delay: 3000, stopOnInteraction: true }));
 
   return (
@@ -47,11 +43,15 @@ export const HomeCarousel = ({
                   priority
                 />
                 <div className="absolute w-1/3 left-16 md:left-32 top-1/2 transform -translate-y-1/2">
-                  <h2 className="text-xl md:text-6xl font-bold mb-4 text-primary">
-                    {item.title}
+                  <h2
+                    className={cn(
+                      "text-xl md:text-6xl font-bold mb-4 text-primary  "
+                    )}
+                  >
+                    {t(`${item.title}`)}
                   </h2>
                   <Button className="hidden md:block">
-                    {item.buttonCaption}
+                    {t(`${item.buttonCaption}`)}
                   </Button>
                 </div>
               </div>

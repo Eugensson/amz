@@ -13,8 +13,8 @@ import User from "@/lib/db/models/user.model";
 import { formatError, round2 } from "@/lib/utils";
 import { OrderInputSchema } from "@/lib/validator";
 import Product from "@/lib/db/models/product.model";
+import { getSetting } from "@/lib/actions/setting.actions";
 import Order, { IOrder } from "@/lib/db/models/order.model";
-import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from "@/lib/constants";
 
 import { Cart, IOrderList, OrderItem, ShippingAddress } from "@/types";
 
@@ -99,10 +99,16 @@ export const getOrderSummary = async (date: DateRange) => {
 
   const topSalesProducts = await getTopSalesProducts(date);
 
+  const {
+    common: { pageSize },
+  } = await getSetting();
+
+  const limit = pageSize;
+
   const latestOrders = await Order.find()
     .populate("user", "name")
     .sort({ createdAt: "desc" })
-    .limit(PAGE_SIZE);
+    .limit(limit);
 
   return {
     ordersCount,
@@ -286,7 +292,11 @@ export const getMyOrders = async ({
   limit?: number;
   page: number;
 }) => {
-  limit = limit || PAGE_SIZE;
+  const {
+    common: { pageSize },
+  } = await getSetting();
+  limit = limit || pageSize;
+
   await connectToDatabase();
   const session = await auth();
   if (!session) {
@@ -383,10 +393,12 @@ export const calcDeliveryDateAndPrice = async ({
     items.reduce((acc, item) => acc + item.price * item.quantity, 0)
   );
 
+  const { availableDeliveryDates } = await getSetting();
+
   const deliveryDate =
-    AVAILABLE_DELIVERY_DATES[
+    availableDeliveryDates[
       deliveryDateIndex === undefined
-        ? AVAILABLE_DELIVERY_DATES.length - 1
+        ? availableDeliveryDates.length - 1
         : deliveryDateIndex
     ];
 
@@ -407,10 +419,10 @@ export const calcDeliveryDateAndPrice = async ({
   );
 
   return {
-    AVAILABLE_DELIVERY_DATES,
+    availableDeliveryDates,
     deliveryDateIndex:
       deliveryDateIndex === undefined
-        ? AVAILABLE_DELIVERY_DATES.length - 1
+        ? availableDeliveryDates.length - 1
         : deliveryDateIndex,
     itemsPrice,
     shippingPrice,
@@ -445,7 +457,10 @@ export const getAllOrders = async ({
   limit?: number;
   page: number;
 }) => {
-  limit = limit || PAGE_SIZE;
+  const {
+    common: { pageSize },
+  } = await getSetting();
+  limit = limit || pageSize;
 
   await connectToDatabase();
 

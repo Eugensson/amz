@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -19,6 +20,7 @@ export const Pagination = ({
   urlParamName,
 }: PaginationProps) => {
   const router = useRouter();
+  const t = useTranslations();
   const searchParams = useSearchParams();
 
   const onClick = (btnType: string) => {
@@ -41,8 +43,9 @@ export const Pagination = ({
         onClick={() => onClick("prev")}
         disabled={Number(page) <= 1}
       >
-        <ChevronLeft /> Previous
+        <ChevronLeft /> {t("Search.Previous")}
       </Button>
+      {t("Search.Page")} {page} {t("Search.of")} {totalPages}
       <Button
         size="lg"
         variant="outline"
@@ -50,7 +53,7 @@ export const Pagination = ({
         onClick={() => onClick("next")}
         disabled={Number(page) >= totalPages}
       >
-        Next <ChevronRight />
+        {t("Search.Next")} <ChevronRight />
       </Button>
     </div>
   );

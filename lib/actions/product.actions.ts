@@ -4,8 +4,8 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
 import { formatError } from "@/lib/utils";
-import { PAGE_SIZE } from "@/lib/constants";
 import { connectToDatabase } from "@/lib/db";
+import { getSetting } from "@/lib/actions/setting.actions";
 import Product, { IProduct } from "@/lib/db/models/product.model";
 import { ProductInputSchema, ProductUpdateSchema } from "@/lib/validator";
 
@@ -70,7 +70,7 @@ export const getProductBySlug = async (slug: string) => {
 export const getRelatedProductsByCategory = async ({
   category,
   productId,
-  limit = PAGE_SIZE,
+  limit = 4,
   page = 1,
 }: {
   category: string;
@@ -115,7 +115,11 @@ export const getAllProducts = async ({
   rating?: string;
   sort?: string;
 }) => {
-  limit = limit || PAGE_SIZE;
+  const {
+    common: { pageSize },
+  } = await getSetting();
+  limit = limit || pageSize;
+
   await connectToDatabase();
 
   const queryFilter =
@@ -293,7 +297,11 @@ export const getAllProductsForAdmin = async ({
 }) => {
   await connectToDatabase();
 
-  const pageSize = limit || PAGE_SIZE;
+  const {
+    common: { pageSize },
+  } = await getSetting();
+
+  limit = limit || pageSize;
 
   const queryFilter =
     query && query !== "all"
@@ -320,8 +328,8 @@ export const getAllProductsForAdmin = async ({
     ...queryFilter,
   })
     .sort(order)
-    .skip(pageSize * (Number(page) - 1))
-    .limit(pageSize)
+    .skip(limit * (Number(page) - 1))
+    .limit(limit)
     .lean();
 
   const countProducts = await Product.countDocuments({

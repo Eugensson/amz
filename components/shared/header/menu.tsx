@@ -1,9 +1,9 @@
+import { useTranslations } from "next-intl";
 import { EllipsisVertical } from "lucide-react";
 
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -11,11 +11,15 @@ import {
 import { ThemeSwitcher } from "./theme-switcher";
 import { CartButton } from "@/components/shared/header/cart-button";
 import { UserButton } from "@/components/shared/header/user-button";
+import { LanguageSwitcher } from "@/components/shared/header/language-switcher";
 
 export const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
+  const t = useTranslations();
+
   return (
     <div className="flex justify-end">
       <nav className="md:flex gap-3 hidden w-full">
+        <LanguageSwitcher />
         <ThemeSwitcher />
         <UserButton />
         {forAdmin ? null : <CartButton />}
@@ -28,10 +32,10 @@ export const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
           <SheetContent className="bg-black text-white flex flex-col items-start">
             <SheetHeader className="w-full">
               <div className="flex items-center justify-between ">
-                <SheetTitle>Site Menu</SheetTitle>
-                <SheetDescription></SheetDescription>
+                <SheetTitle className="  ">{t("Header.Site Menu")}</SheetTitle>
               </div>
             </SheetHeader>
+            <LanguageSwitcher />
             <ThemeSwitcher />
             <UserButton />
             <CartButton />

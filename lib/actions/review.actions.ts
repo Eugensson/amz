@@ -9,10 +9,10 @@ import { auth } from "@/auth";
 import { IReviewDetails } from "@/types";
 
 import { formatError } from "@/lib/utils";
-import { PAGE_SIZE } from "@/lib/constants";
 import { connectToDatabase } from "@/lib/db";
 import { ReviewInputSchema } from "@/lib/validator";
 import Product from "@/lib/db/models/product.model";
+import { getSetting } from "@/lib/actions/setting.actions";
 import Review, { IReview } from "@/lib/db/models/review.model";
 
 export async function createUpdateReview({
@@ -108,7 +108,11 @@ export async function getReviews({
   limit?: number;
   page: number;
 }) {
-  limit = limit || PAGE_SIZE;
+  const {
+    common: { pageSize },
+  } = await getSetting();
+  limit = limit || pageSize;
+
   await connectToDatabase();
   const skipAmount = (page - 1) * limit;
   const reviews = await Review.find({ product: productId })

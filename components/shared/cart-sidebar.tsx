@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { TrashIcon } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 
 import {
   Select,
@@ -16,9 +17,10 @@ import { ProductPrice } from "@/components/shared/product/product-price";
 
 import { cn } from "@/lib/utils";
 
-import useCartStore from "@/hooks/use-cart-store";
+import { getDirection } from "@/i18n-config";
 
-import { FREE_SHIPPING_MIN_PRICE } from "@/lib/constants";
+import useCartStore from "@/hooks/use-cart-store";
+import useSettingStore from "@/hooks/use-setting-store";
 
 export const CartSidebar = () => {
   const {
@@ -26,19 +28,30 @@ export const CartSidebar = () => {
     updateItem,
     removeItem,
   } = useCartStore();
+  const {
+    setting: {
+      common: { freeShippingMinPrice },
+    },
+  } = useSettingStore();
+  const t = useTranslations();
+  const locale = useLocale();
 
   return (
-    <div className="w-36 overflow-y-auto">
-      <div className={`fixed border-l h-full`}>
-        <div className="p-2 h-full flex flex-col gap-2 justify-start items-center">
+    <div className="w-32 overflow-y-auto">
+      <div
+        className={`w-32 fixed  h-full ${
+          getDirection(locale) === "rtl" ? "border-r" : "border-l"
+        }`}
+      >
+        <div className="p-2 h-full flex flex-col gap-2 justify-center items-center">
           <div className="text-center space-y-2">
-            <div> Subtotal</div>
-            <div className="font-bold">
+            <div> {t("Cart.Subtotal")}</div>
+            <div className="font-bold ">
               <ProductPrice price={itemsPrice} plain />
             </div>
-            {itemsPrice > FREE_SHIPPING_MIN_PRICE && (
+            {itemsPrice > freeShippingMinPrice && (
               <div className=" text-center text-xs">
-                Your order qualifies for FREE Shipping
+                {t("Cart.Your order qualifies for FREE Shipping")}
               </div>
             )}
 
@@ -49,7 +62,7 @@ export const CartSidebar = () => {
               )}
               href="/cart"
             >
-              Go to Cart
+              {t("Cart.Go to Cart")}
             </Link>
             <Separator className="mt-3" />
           </div>

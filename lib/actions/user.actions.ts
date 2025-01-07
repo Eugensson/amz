@@ -8,9 +8,9 @@ import { revalidatePath } from "next/cache";
 import { auth, signIn, signOut } from "@/auth";
 
 import { formatError } from "@/lib/utils";
-import { PAGE_SIZE } from "@/lib/constants";
 import { connectToDatabase } from "@/lib/db";
 import User, { IUser } from "@/lib/db/models/user.model";
+import { getSetting } from "@/lib/actions/setting.actions";
 import { UserSignUpSchema, UserUpdateSchema } from "@/lib/validator";
 
 import { IUserName, IUserSignIn, IUserSignUp } from "@/types";
@@ -91,7 +91,10 @@ export const getAllUsers = async ({
   limit?: number;
   page: number;
 }) => {
-  limit = limit || PAGE_SIZE;
+  const {
+    common: { pageSize },
+  } = await getSetting();
+  limit = limit || pageSize;
 
   await connectToDatabase();
 
