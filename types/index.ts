@@ -11,6 +11,7 @@ import {
   UserNameSchema,
   UserSignInSchema,
   UserSignUpSchema,
+  WebPageInputSchema,
 } from "@/lib/validator";
 
 export type IReviewInput = z.infer<typeof ReviewInputSchema>;
@@ -44,6 +45,12 @@ export type Data = {
     buttonCaption: string;
     isPublished: boolean;
   }[];
+  webPages: {
+    title: string;
+    slug: string;
+    content: string;
+    isPublished: boolean;
+  }[];
 };
 
 export type Cart = z.infer<typeof CartSchema>;
@@ -63,3 +70,5 @@ export type IUserName = z.infer<typeof UserNameSchema>;
 export type IUserInput = z.infer<typeof UserInputSchema>;
 export type IUserSignIn = z.infer<typeof UserSignInSchema>;
 export type IUserSignUp = z.infer<typeof UserSignUpSchema>;
+
+export type IWebPageInput = z.infer<typeof WebPageInputSchema>;

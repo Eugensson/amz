@@ -6,12 +6,13 @@ import { connectToDatabase } from "@/lib/db";
 import User from "@/lib/db/models/user.model";
 import Review from "@/lib/db/models/review.model";
 import Product from "@/lib/db/models/product.model";
+import WebPage from "@/lib/db/models/web-page.model";
 
 loadEnvConfig(cwd());
 
 const main = async () => {
   try {
-    const { users, products, reviews } = data;
+    const { users, products, reviews, webPages } = data;
     await connectToDatabase(process.env.MONGODB_URI);
 
     await User.deleteMany();
@@ -19,6 +20,9 @@ const main = async () => {
 
     await Product.deleteMany();
     const createdProducts = await Product.insertMany(products);
+
+    await WebPage.deleteMany();
+    await WebPage.insertMany(webPages);
 
     await Review.deleteMany();
     const rws = [];
