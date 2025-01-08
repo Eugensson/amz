@@ -31,146 +31,158 @@ export const Footer = () => {
   const t = useTranslations();
 
   return (
-    <footer className="bg-black text-white underline-link">
-      <div className="w-full">
-        <Button
-          variant="ghost"
-          className="bg-gray-800 w-full rounded-none"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        >
-          <ChevronUp size={16} className="mr-2" />
-          {t("Footer.Back to top")}
-        </Button>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 max-w-7xl mx-auto">
-        <div>
+    <footer className="bg-gray-950 text-white">
+      <Button
+        variant="ghost"
+        className="bg-gray-800 w-full rounded-none"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        <ChevronUp size={16} className="mr-2" />
+        {t("Footer.Back to top")}
+      </Button>
+      <ul className="container max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-6 py-5">
+        <li>
           <h3 className="font-bold mb-2">{t("Footer.Get to Know Us")}</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="/page/careers">{t("Footer.Careers")}</Link>
+              <Link href="/page/careers" className="link">
+                {t("Footer.Careers")}
+              </Link>
             </li>
             <li>
-              <Link href="/page/blog">{t("Footer.Blog")}</Link>
+              <Link href="/page/blog" className="link">
+                {t("Footer.Blog")}
+              </Link>
             </li>
             <li>
-              <Link href="/page/about-us">
+              <Link href="/page/about-us" className="link">
                 {t("Footer.About name", { name: site.name })}
               </Link>
             </li>
           </ul>
-        </div>
-        <div>
+        </li>
+        <li>
           <h3 className="font-bold mb-2">{t("Footer.Make Money with Us")}</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="/page/sell">
+              <Link href="/page/sell" className="link">
                 {t("Footer.Sell products on", { name: site.name })}
               </Link>
             </li>
             <li>
-              <Link href="/page/become-affiliate">
+              <Link href="/page/become-affiliate" className="link">
                 {t("Footer.Become an Affiliate")}
               </Link>
             </li>
             <li>
-              <Link href="/page/advertise">
+              <Link href="/page/advertise" className="link">
                 {t("Footer.Advertise Your Products")}
               </Link>
             </li>
           </ul>
-        </div>
-        <div>
+        </li>
+        <li>
           <h3 className="font-bold mb-2">{t("Footer.Let Us Help You")}</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="/page/shipping">
+              <Link href="/page/shipping" className="link">
                 {t("Footer.Shipping Rates & Policies")}
               </Link>
             </li>
             <li>
-              <Link href="/page/returns-policy">
+              <Link href="/page/returns-policy" className="link">
                 {t("Footer.Returns & Replacements")}
               </Link>
             </li>
             <li>
-              <Link href="/page/help">{t("Footer.Help")}</Link>
+              <Link href="/page/help" className="link">
+                {t("Footer.Help")}
+              </Link>
             </li>
           </ul>
-        </div>
-      </div>
+        </li>
+      </ul>
       <div className="border-t border-gray-800">
-        <div className="max-w-7xl mx-auto py-8 px-4 flex flex-col items-center space-y-4">
-          <div className="flex items-center space-x-4 flex-wrap md:flex-nowrap">
-            <Image
-              src="/icons/logo.svg"
-              alt={`${site.name} logo`}
-              width={48}
-              height={48}
-              className="w-14"
-              style={{
-                maxWidth: "100%",
-                height: "auto",
-              }}
-            />{" "}
-            <Select
-              value={locale}
-              onValueChange={(value) => {
-                router.push(pathname, { locale: value });
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t("Footer.Select a language")} />
-              </SelectTrigger>
-              <SelectContent>
-                {locales.map((lang, index) => (
-                  <SelectItem key={index} value={lang.code}>
-                    <Link
-                      className="w-full flex items-center gap-1"
-                      href={pathname}
-                      locale={lang.code}
-                    >
-                      <span className="text-lg">{lang.icon}</span> {lang.name}
-                    </Link>
+        <div className="container py-5 flex flex-wrap items-center gap-5 justify-center">
+          <Image
+            src="/icons/logo.svg"
+            alt={`${site.name} logo`}
+            width={40}
+            height={40}
+            className="aspect-square"
+          />
+          <Select
+            value={locale}
+            onValueChange={(value) => {
+              router.push(pathname, { locale: value });
+            }}
+          >
+            <SelectTrigger className="w-full max-w-[220px]">
+              <SelectValue placeholder={t("Footer.Select a language")} />
+            </SelectTrigger>
+            <SelectContent>
+              {locales.map((lang, index) => (
+                <SelectItem key={index} value={lang.code}>
+                  <Link
+                    className="w-full flex items-center gap-2"
+                    href={pathname}
+                    locale={lang.code}
+                  >
+                    <Image
+                      src={lang.icon}
+                      alt={lang.name}
+                      width={20}
+                      height={20}
+                    />
+                    {lang.name}
+                  </Link>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={currency}
+            onValueChange={(value) => {
+              setCurrency(value);
+              window.scrollTo(0, 0);
+            }}
+          >
+            <SelectTrigger className="w-full max-w-[220px]">
+              <SelectValue placeholder={t("Footer.Select a currency")} />
+            </SelectTrigger>
+            <SelectContent>
+              {availableCurrencies
+                .filter((x) => x.code)
+                .map((currency, index) => (
+                  <SelectItem key={index} value={currency.code}>
+                    {currency.name} ({currency.code})
                   </SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={currency}
-              onValueChange={(value) => {
-                setCurrency(value);
-                window.scrollTo(0, 0);
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t("Footer.Select a currency")} />
-              </SelectTrigger>
-              <SelectContent>
-                {availableCurrencies
-                  .filter((x) => x.code)
-                  .map((currency, index) => (
-                    <SelectItem key={index} value={currency.code}>
-                      {currency.name} ({currency.code})
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          </div>
+            </SelectContent>
+          </Select>
         </div>
-      </div>
-      <div className="p-4">
-        <div className="flex justify-center gap-3 text-sm">
-          <Link href="/page/conditions-of-use">
-            {t("Footer.Conditions of Use")}
-          </Link>
-          <Link href="/page/privacy-policy">{t("Footer.Privacy Notice")}</Link>
-          <Link href="/page/help">{t("Footer.Help")}</Link>
-        </div>
-        <div className="flex justify-center text-sm">
-          <p> © {site.copyright}</p>
-        </div>
-        <div className="mt-8 flex justify-center text-sm text-gray-400">
-          {site.address} | {site.phone}
+        <div className="flex flex-col justify-center gap-2 text-center text-sm">
+          <ul className="flex justify-center items-center gap-5">
+            <li>
+              <Link href="/page/conditions-of-use" className="link">
+                {t("Footer.Conditions of Use")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/page/privacy-policy" className="link">
+                {t("Footer.Privacy Notice")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/page/help" className="link">
+                {t("Footer.Help")}
+              </Link>
+            </li>
+          </ul>
+          <p className="text-xs">&copy; {site.copyright}</p>
+          <p className="text-xs">
+            {site.address} | {site.phone}
+          </p>
         </div>
       </div>
     </footer>

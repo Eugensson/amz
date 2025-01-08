@@ -101,6 +101,10 @@ body {
   .web-page-content p {
     @apply py-2;
   }
+
+  .link {
+    @apply text-sm font-light hover:underline hover:underline-offset-2 hover:text-blue-500 transition-all duration-300;
+  }
 }
 
 .custom-zoom [data-rmiz-modal-overlay],

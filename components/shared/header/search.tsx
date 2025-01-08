@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 
+import { cn } from "@/lib/utils";
 import { getSetting } from "@/lib/actions/setting.actions";
 import { getAllCategories } from "@/lib/actions/product.actions";
 
-export const Search = async () => {
+export const Search = async ({ className }: { className?: string }) => {
   const {
     site: { name },
   } = await getSetting();
@@ -21,7 +22,11 @@ export const Search = async () => {
   const categories = await getAllCategories();
 
   return (
-    <form action="/search" method="GET" className="h-10 flex items-stretch">
+    <form
+      action="/search"
+      method="GET"
+      className={cn("h-10 flex items-stretch", className)}
+    >
       <Select name="category">
         <SelectTrigger className="w-auto h-full dark:border-gray-200 bg-gray-100 text-black border-r  rounded-r-none rounded-l-md rtl:rounded-r-md rtl:rounded-l-none  ">
           <SelectValue placeholder={t("Header.All")} />

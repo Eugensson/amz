@@ -7,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { ProductSlider } from "@/components/shared/product/product-slider";
 
 import { cn } from "@/lib/utils";
-
 import useBrowsingHistory from "@/hooks/use-browsing-history";
 
 export const BrowsingHistoryList = ({ className }: { className?: string }) => {

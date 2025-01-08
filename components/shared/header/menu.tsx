@@ -8,9 +8,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ThemeSwitcher } from "./theme-switcher";
 import { CartButton } from "@/components/shared/header/cart-button";
 import { UserButton } from "@/components/shared/header/user-button";
+import { ThemeSwitcher } from "@/components/shared/header/theme-switcher";
 import { LanguageSwitcher } from "@/components/shared/header/language-switcher";
 
 export const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {

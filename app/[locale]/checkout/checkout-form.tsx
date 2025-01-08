@@ -671,7 +671,7 @@ export const CheckoutForm = () => {
               </>
             ) : (
               <div className="flex text-muted-foreground text-lg font-bold my-4 py-3">
-                <span className="w-8">3 </span>
+                <span className="w-8">3</span>
                 <span>Items and shipping</span>
               </div>
             )}
@@ -682,7 +682,7 @@ export const CheckoutForm = () => {
                 <CheckoutSummary />
               </div>
 
-              <Card className="hidden md:block ">
+              <Card className="hidden md:block">
                 <CardContent className="p-4 flex flex-col md:flex-row justify-between items-center gap-3">
                   <Button onClick={handlePlaceOrder} className="rounded-full">
                     Place Your Order

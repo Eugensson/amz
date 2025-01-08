@@ -16,13 +16,13 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { ProductPrice } from "@/components/shared/product/product-price";
 
 import { cn } from "@/lib/utils";
-
 import { getDirection } from "@/i18n-config";
-
 import useCartStore from "@/hooks/use-cart-store";
 import useSettingStore from "@/hooks/use-setting-store";
 
 export const CartSidebar = () => {
+  const locale = useLocale();
+  const t = useTranslations();
   const {
     cart: { items, itemsPrice },
     updateItem,
@@ -33,8 +33,6 @@ export const CartSidebar = () => {
       common: { freeShippingMinPrice },
     },
   } = useSettingStore();
-  const t = useTranslations();
-  const locale = useLocale();
 
   return (
     <div className="w-32 overflow-y-auto">

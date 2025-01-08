@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { AtSign, Eye, EyeOff, Key, User } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { redirect, useSearchParams } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
@@ -16,7 +18,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 
 import {
   registerUser,
@@ -48,6 +49,7 @@ export const CredentialsSignInForm = () => {
   } = useSettingStore();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const [isVisiblePassword, setIsVisiblePassword] = useState(false);
 
   const form = useForm<IUserSignUp>({
     resolver: zodResolver(UserSignUpSchema),
@@ -88,29 +90,89 @@ export const CredentialsSignInForm = () => {
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <input type="hidden" name="callbackUrl" value={callbackUrl} />
-        <div className="space-y-6">
+        <div className="space-y-5">
           <FormField
             control={control}
             name="name"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Name</FormLabel>
+                <FormLabel className="sr-only">Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter name address" {...field} />
+                  <div className="relative">
+                    <Input
+                      placeholder="Enter name address"
+                      {...field}
+                      className="pl-8"
+                    />
+                    <User
+                      size={16}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
           <FormField
             control={control}
             name="email"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Email</FormLabel>
+                <FormLabel className="sr-only">Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter email address" {...field} />
+                  <div className="relative">
+                    <Input
+                      placeholder="Enter email address"
+                      {...field}
+                      className="pl-8"
+                    />
+                    <AtSign
+                      size={16}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel className="sr-only">Password</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input
+                      type={isVisiblePassword ? "text" : "password"}
+                      placeholder="Enter password"
+                      className="px-8"
+                      {...field}
+                    />
+                    <Key
+                      size={16}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
+                    {isVisiblePassword ? (
+                      <EyeOff
+                        size={16}
+                        onClick={() =>
+                          setIsVisiblePassword((prevState) => !prevState)
+                        }
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer"
+                      />
+                    ) : (
+                      <Eye
+                        size={16}
+                        onClick={() =>
+                          setIsVisiblePassword((prevState) => !prevState)
+                        }
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer"
+                      />
+                    )}
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -119,52 +181,35 @@ export const CredentialsSignInForm = () => {
 
           <FormField
             control={control}
-            name="password"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter password"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
             name="confirmPassword"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel className="sr-only">Confirm Password</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={isVisiblePassword ? "text" : "password"}
+                      placeholder="Confirm Password"
+                      className="pl-8"
+                      {...field}
+                    />
+                    <Key
+                      size={16}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <div>
-            <Button type="submit">Sign Up</Button>
-          </div>
-          <div className="text-sm">
+          <Button type="submit" className="w-full">
+            Sign Up
+          </Button>
+          <div className="text-xs text-center">
             By creating an account, you agree to {site.name}&apos;s{" "}
             <Link href="/page/conditions-of-use">Conditions of Use</Link> and{" "}
             <Link href="/page/privacy-policy"> Privacy Notice. </Link>
-          </div>
-          <Separator className="mb-4" />
-          <div className="text-sm">
-            Already have an account?{" "}
-            <Link className="link" href={`/sign-in?callbackUrl=${callbackUrl}`}>
-              Sign In
-            </Link>
           </div>
         </div>
       </form>

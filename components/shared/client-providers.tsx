@@ -6,7 +6,6 @@ import { ThemeProvider } from "@/components/shared/theme-provider";
 import { AppInitializer } from "@/components/shared/app-initializer";
 
 import { ClientSetting } from "@/types";
-
 import useCartSidebar from "@/hooks/use-cart-sidebar";
 
 export const ClientProviders = ({

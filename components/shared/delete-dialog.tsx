@@ -1,5 +1,6 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 
 import {
@@ -25,14 +26,15 @@ export const DeleteDialog = ({
   action: (id: string) => Promise<{ success: boolean; message: string }>;
   callbackAction?: () => void;
 }) => {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const { toast } = useToast();
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button size="sm" variant="outline">
-          Delete
+          <Trash2 size={20} />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -44,7 +46,6 @@ export const DeleteDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-
           <Button
             variant="destructive"
             size="sm"

@@ -1,6 +1,15 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { Info } from "lucide-react";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -22,6 +31,7 @@ import { deleteOrder, getAllOrders } from "@/lib/actions/order.actions";
 export const metadata: Metadata = {
   title: "Admin Orders",
 };
+
 const OrdersPage = async (props: {
   searchParams: Promise<{ page: string }>;
 }) => {
@@ -30,16 +40,21 @@ const OrdersPage = async (props: {
   const { page = "1" } = searchParams;
 
   const session = await auth();
+
   if (session?.user.role !== "Admin")
     throw new Error("Admin permission required");
 
   const orders = await getAllOrders({
     page: Number(page),
   });
+
   return (
-    <div className="space-y-2">
-      <h1 className="h1-bold">Orders</h1>
-      <div className="overflow-x-auto">
+    <Card>
+      <CardHeader>
+        <CardTitle>Orders</CardTitle>
+        <CardDescription>Orders Description</CardDescription>
+      </CardHeader>
+      <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
@@ -78,7 +93,9 @@ const OrdersPage = async (props: {
                 </TableCell>
                 <TableCell className="flex gap-1">
                   <Button asChild variant="outline" size="sm">
-                    <Link href={`/admin/orders/${order._id}`}>Details</Link>
+                    <Link href={`/admin/orders/${order._id}`}>
+                      <Info size={20} />
+                    </Link>
                   </Button>
                   <DeleteDialog id={order._id} action={deleteOrder} />
                 </TableCell>
@@ -86,11 +103,13 @@ const OrdersPage = async (props: {
             ))}
           </TableBody>
         </Table>
+      </CardContent>
+      <CardFooter>
         {orders.totalPages > 1 && (
           <Pagination page={page} totalPages={orders.totalPages!} />
         )}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 };
 

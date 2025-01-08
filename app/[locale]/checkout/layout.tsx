@@ -24,7 +24,7 @@ const CheckoutLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
           <div>
             <Link href="/page/help">
-              <HelpCircle className="w-6 h-6" />
+              <HelpCircle size={20} />
             </Link>
           </div>
         </div>

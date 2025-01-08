@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import { ClientSetting } from "@/types";
-
 import useSettingStore from "@/hooks/use-setting-store";
 
 export const AppInitializer = ({
@@ -16,6 +15,7 @@ export const AppInitializer = ({
   useEffect(() => {
     setRendered(true);
   }, [setting]);
+
   if (!rendered) {
     useSettingStore.setState({
       setting,

@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { AtSign, Eye, EyeOff, Key } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { redirect, useSearchParams } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
@@ -40,6 +42,7 @@ export const CredentialsSignInForm = () => {
   } = useSettingStore();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const [isVisiblePassword, setIsVisiblePassword] = useState(false);
 
   const form = useForm<IUserSignIn>({
     resolver: zodResolver(UserSignInSchema),
@@ -71,43 +74,75 @@ export const CredentialsSignInForm = () => {
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <input type="hidden" name="callbackUrl" value={callbackUrl} />
-        <div className="space-y-6">
+        <div className="space-y-5">
           <FormField
             control={control}
             name="email"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Email</FormLabel>
+                <FormLabel className="sr-only">Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter email address" {...field} />
+                  <div className="relative">
+                    <Input
+                      placeholder="Enter email address"
+                      {...field}
+                      className="pl-8"
+                    />
+                    <AtSign
+                      size={16}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
           <FormField
             control={control}
             name="password"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Password</FormLabel>
+                <FormLabel className="sr-only">Password</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter password"
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={isVisiblePassword ? "text" : "password"}
+                      placeholder="Enter password"
+                      className="px-8"
+                      {...field}
+                    />
+                    <Key
+                      size={16}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
+                    {isVisiblePassword ? (
+                      <EyeOff
+                        size={16}
+                        onClick={() =>
+                          setIsVisiblePassword((prevState) => !prevState)
+                        }
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer"
+                      />
+                    ) : (
+                      <Eye
+                        size={16}
+                        onClick={() =>
+                          setIsVisiblePassword((prevState) => !prevState)
+                        }
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer"
+                      />
+                    )}
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
-          <div>
-            <Button type="submit">Sign In</Button>
-          </div>
-          <div className="text-sm">
+          <Button type="submit" className="w-full">
+            Sign In
+          </Button>
+          <div className="text-xs text-center">
             By signing in, you agree to {site.name}&apos;s{" "}
             <Link href="/page/conditions-of-use">Conditions of Use</Link> and{" "}
             <Link href="/page/privacy-policy">Privacy Notice.</Link>

@@ -1,6 +1,15 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { Pencil } from "lucide-react";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -37,9 +46,12 @@ const AdminUser = async (props: {
   const users = await getAllUsers({ page });
 
   return (
-    <div className="space-y-2">
-      <h1 className="h1-bold">Users</h1>
-      <div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Users</CardTitle>
+        <CardDescription>Users Description</CardDescription>
+      </CardHeader>
+      <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
@@ -59,7 +71,9 @@ const AdminUser = async (props: {
                 <TableCell>{user.role}</TableCell>
                 <TableCell className="flex gap-1">
                   <Button asChild variant="outline" size="sm">
-                    <Link href={`/admin/users/${user._id}`}>Edit</Link>
+                    <Link href={`/admin/users/${user._id}`}>
+                      <Pencil size={20} />
+                    </Link>
                   </Button>
                   <DeleteDialog id={user._id} action={deleteUser} />
                 </TableCell>
@@ -67,11 +81,13 @@ const AdminUser = async (props: {
             ))}
           </TableBody>
         </Table>
+      </CardContent>
+      <CardFooter>
         {users?.totalPages > 1 && (
           <Pagination page={page} totalPages={users?.totalPages} />
         )}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 };
 

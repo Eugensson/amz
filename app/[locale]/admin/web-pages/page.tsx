@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { Pencil } from "lucide-react";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -22,15 +30,18 @@ export const metadata: Metadata = {
 
 const WebPageAdminPage = async () => {
   const webPages = await getAllWebPages();
+
   return (
-    <div className="space-y-2">
-      <div className="flex-between">
-        <h1 className="h1-bold">Web Pages</h1>
-        <Button asChild variant="default">
-          <Link href="/admin/web-pages/create">Create WebPage</Link>
-        </Button>
-      </div>
-      <div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Web Pages</CardTitle>
+        <CardDescription className="ml-auto">
+          <Button asChild>
+            <Link href="/admin/web-pages/create">Create WebPage</Link>
+          </Button>
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
@@ -50,7 +61,9 @@ const WebPageAdminPage = async () => {
                 <TableCell>{webPage.isPublished ? "Yes" : "No"}</TableCell>
                 <TableCell className="flex gap-1">
                   <Button asChild variant="outline" size="sm">
-                    <Link href={`/admin/web-pages/${webPage._id}`}>Edit</Link>
+                    <Link href={`/admin/web-pages/${webPage._id}`}>
+                      <Pencil size={20} />
+                    </Link>
                   </Button>
                   <DeleteDialog id={webPage._id} action={deleteWebPage} />
                 </TableCell>
@@ -58,8 +71,8 @@ const WebPageAdminPage = async () => {
             ))}
           </TableBody>
         </Table>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

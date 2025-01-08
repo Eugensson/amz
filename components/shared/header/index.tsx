@@ -19,29 +19,22 @@ export const Header = async () => {
     <header className="bg-black text-white">
       <div className="px-2">
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Link
-              href="/"
-              className="flex items-center header-button font-extrabold text-2xl m-1 "
-            >
-              <Image
-                src={site.logo}
-                width={40}
-                height={40}
-                alt={`${site.name} logo`}
-              />
-              {site.name}
-            </Link>
-          </div>
-
-          <div className="hidden md:block flex-1 max-w-xl">
-            <Search />
-          </div>
+          <Link
+            href="/"
+            className="flex items-center header-button font-extrabold text-2xl m-1 "
+          >
+            <Image
+              src={site.logo}
+              width={40}
+              height={40}
+              alt={`${site.name} logo`}
+            />
+            {site.name}
+          </Link>
+          <Search className="hidden lg:flex flex-1 max-w-xl" />
           <Menu />
         </div>
-        <div className="md:hidden block py-2">
-          <Search />
-        </div>
+        <Search className="lg:hidden flex flex-1" />
       </div>
       <div className="flex items-center px-3 mb-[1px] bg-gray-800">
         <Sidebar categories={categories} />

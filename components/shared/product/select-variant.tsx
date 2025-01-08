@@ -57,7 +57,7 @@ export const SelectVariant = ({
               asChild
               variant="outline"
               className={
-                selectedSize === x ? "border-2  border-primary" : "border-2  "
+                selectedSize === x ? "border-2  border-primary" : "border-2"
               }
               key={x}
             >
